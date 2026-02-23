@@ -46,4 +46,4 @@ def query_in_book_result(query: str, book_entry: List[dict]):
     
 
 
-app.run(host="0.0.0.0", port="5000")
+app.run(host="0.0.0.0", port="5050")
