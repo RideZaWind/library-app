@@ -59,27 +59,70 @@
         button:active {
             transform: scale(0.98);
         }
-    
+
         #result_list {
             list-style: none;
             padding: 0;
             margin: 40px auto;
-            max-width: 600px;
+            max-width: 900px;
         }
-    
-        #result_list li {
+
+        .book-card {
+            display: flex;
+            gap: 20px;
             background-color: white;
-            padding: 14px 18px;
-            margin-bottom: 12px;
-            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 18px;
+            border-radius: 10px;
             border: 1px solid #e1e4e8;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-    
-        #result_list li:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+        .book-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .cover img {
+            width: 120px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .no-cover {
+            width: 120px;
+            height: 180px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .book-info {
+            flex: 1;
+        }
+
+        .book-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .authors {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .description {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.5;
         }
     
         /* Center search area */
@@ -99,10 +142,32 @@
                 dataType: "json",
                 success: function (data) {
                     $("#result_list").empty();
-                    for(var i = 0; i < data.length; i++) {
-                        $("#result_list").append("<li>" + data[i].name + ": " + data[i].description + "</li>");
-                    }
 
+                    for (var i = 0; i < data.length; i++) {
+                    
+                        var authors = Array.isArray(data[i].authors)
+                            ? data[i].authors.join(", ")
+                            : data[i].authors;
+                    
+                        var cover = data[i].cover_url
+                            ? `<img src="${data[i].cover_url}" alt="Book Cover">`
+                            : `<div class="no-cover">No Image</div>`;
+                    
+                        var bookCard = `
+                            <li class="book-card">
+                                <div class="cover">
+                                    ${cover}
+                                </div>
+                                <div class="book-info">
+                                    <h3>${data[i].name}</h3>
+                                    <p class="authors"><strong>By:</strong> ${authors}</p>
+                                    <p class="description">${data[i].description}</p>
+                                </div>
+                            </li>
+                        `;
+                    
+                        $("#result_list").append(bookCard);
+                    }
                 },
                 error: function (xhr, status, err) {
                     console.error("Error:", status, err, xhr.responseText);

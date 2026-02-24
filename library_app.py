@@ -39,7 +39,12 @@ def welcome():
 
 @app.route("/search/<query>")
 def search_books(query):
-    return [{"name": entry["name"], "description":entry["description"]} for entry in collection.find() if query_in_book_result(query, entry)]
+    return [{
+        "name": entry["name"],
+        "description": entry["description"],
+        "authors": entry["authors"],
+        "cover_url": entry["cover_url"]
+        } for entry in collection.find() if query_in_book_result(query, entry)]
 
 def query_in_book_result(query: str, book_entry: dict):
     return query.lower() in book_entry["name"].lower() or query.lower() in book_entry["description"].lower()
