@@ -45,17 +45,24 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/library-app
-
+          
             echo "Stopping existing Flask app..."
-            PIDS=$(pgrep -f "python3.12 library_app.py") || true
-            if [ ! -z "$PIDS" ]; then
-              kill -9 $PIDS
+          
+            if [ -f app.pid ]; then
+              PID=$(cat app.pid)
+              if ps -p $PID > /dev/null 2>&1; then
+                kill $PID
+                sleep 2
+              fi
             fi
-
+          
             echo "Pulling latest code..."
             git pull --rebase
-
+          
             echo "Starting Flask app..."
             nohup python3.12 library_app.py > log.txt 2>&1 &
-
+            echo $! > app.pid
+          
+            sleep 3
+          
             echo "Deployment complete."
