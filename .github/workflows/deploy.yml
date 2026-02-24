@@ -47,7 +47,10 @@ jobs:
             cd /home/ec2-user/library-app
 
             echo "Stopping existing Flask app..."
-            pkill -f library_app.py || true
+            PIDS=$(pgrep -f "python3.12 library_app.py") || true
+            if [ ! -z "$PIDS" ]; then
+              kill -9 $PIDS
+            fi
 
             echo "Pulling latest code..."
             git pull --rebase
