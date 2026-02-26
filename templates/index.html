@@ -134,20 +134,32 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         function search() {
-            var query = $("#search_input").val();
-
+            var rawQuery = $("#search_input").val();
+            var query = rawQuery.trim();
+                
+            var isDefaultSearch = !query;
+                
+            if (isDefaultSearch) {
+                query = " ";
+                $("#results_header").text("Featured Books");
+            } else {
+                $("#results_header").text(`Results for "${query}"`);
+            }
+        
             $.ajax({
                 url: `/search/${encodeURIComponent(query)}`,
                 method: "GET",
                 dataType: "json",
                 success: function (data) {
                     $("#result_list").empty();
-
-                    for (var i = 0; i < data.length; i++) {
+                
+                    var resultsToShow = isDefaultSearch
+                        ? Math.min(5, data.length)
+                        : data.length;
+                
+                    for (var i = 0; i < resultsToShow; i++) {
                     
-                        var authors = Array.isArray(data[i].authors)
-                            ? data[i].authors.join(", ")
-                            : data[i].authors;
+                        var authors = data[i].authors;
                     
                         var cover = data[i].cover_url
                             ? `<img src="${data[i].cover_url}" alt="Book Cover">`
@@ -174,6 +186,10 @@
                 }
             });
         }
+
+        $(document).ready(function () {
+            search(); // Load featured books immediately
+        });
     </script>
 </head>
 
@@ -184,6 +200,7 @@
         <input id="search_input" type="text" placeholder="Search books...">
         <button onclick="search()">Search</button>
     </div>
+    <h2 id="results_header" style="text-align:center; margin-top:40px;"></h2>
     <ul id="result_list"></ul>
 </body>
 </html>
